@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中文詞彙分析工具 | Chinese Vocabulary Analyzer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c41e3a;
+            --secondary: #f4a460;
+            --accent: #2d5f3f;
+            --bg-main: #faf8f3;
+            --bg-card: #ffffff;
+            --text-primary: #2c2416;
+            --text-secondary: #6b5d4f;
+            --border: #e5dcc9;
+            --shadow: rgba(44, 36, 22, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, var(--bg-main) 0%, #f0ebe0 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(196, 30, 58, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(244, 164, 96, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.05em;
+            text-shadow: 2px 2px 4px var(--shadow);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+        }
+
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease 0.2s backwards;
+        }
+
+        .step {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #fcfaf7 100%);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(196, 30, 58, 0.15);
+            border-color: var(--primary);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            line-height: 32px;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 24px var(--shadow);
+            border: 1px solid var(--border);
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .card-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card-title::before {
+            content: '◆';
+            color: var(--secondary);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            background: #fdfcfa;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, #a31829 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--secondary) 0%, #e69850 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(244, 164, 96, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--accent) 0%, #245033 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(45, 95, 63, 0.3);
+        }
+
+        .file-upload {
+            margin-top: 1rem;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #6b5d4f 0%, #544836 100%);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .file-upload-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(107, 93, 79, 0.3);
+        }
+
+        .vocab-database {
+            grid-column: 1 / -1;
+        }
+
+        .vocab-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #fdfcfa;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .vocab-item {
+            padding: 0.5rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .vocab-item:hover {
+            background: #fff5f0;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .results-section {
+            grid-column: 1 / -1;
+        }
+
+        .word-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .word-tag {
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, #fff 0%, #fef9f5 100%);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .word-tag:hover {
+            background: linear-gradient(135deg, #fff5f0 0%, #ffeee5 100%);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.15);
+        }
+
+        .word-tag.selected {
+            background: linear-gradient(135deg, var(--primary) 0%, #a31829 100%);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .word-level {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: var(--secondary);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .word-level-none {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            background: #9e9e9e;
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .word-tag.selected .word-level,
+        .word-tag.selected .word-level-none {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: auto;
+        }
+
+        .action-btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: #245033;
+            transform: scale(1.05);
+        }
+
+        .word-controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
+        }
+
+        .word-input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .status-message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .status-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            color: #1565c0;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .status-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            color: #e65100;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .vocab-table thead {
+            background: linear-gradient(135deg, var(--primary) 0%, #a31829 100%);
+            color: white;
+        }
+
+        .vocab-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 3px solid var(--secondary);
+        }
+
+        .vocab-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .vocab-table tbody tr:hover {
+            background: #fff5f0;
+        }
+
+        .vocab-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .vocab-table td {
+            padding: 1rem;
+            font-size: 1rem;
+        }
+
+        .vocab-table .col-number {
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .vocab-table .col-word {
+            width: 120px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vocab-table .col-pinyin {
+            width: 150px;
+            font-style: italic;
+            color: var(--accent);
+            font-size: 1rem;
+        }
+
+        .vocab-table .col-definition {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .vocab-table .col-level {
+            width: 100px;
+            text-align: center;
+        }
+
+        .vocab-table .level-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .vocab-table .level-badge.has-level {
+            background: linear-gradient(135deg, var(--secondary) 0%, #e69850 100%);
+            color: white;
+        }
+
+        .vocab-table .level-badge.no-level {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .vocab-list-stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #fff8f0 0%, #fff 100%);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media print {
+            .button-group, .workflow-steps, header .subtitle, .word-tag .action-buttons {
+                display: none !important;
+            }
+            
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+                border: 1px solid #ddd;
+            }
+            
+            body {
+                background: white !important;
+            }
+
+            body::before {
+                display: none;
+            }
+
+            .vocab-table {
+                page-break-inside: avoid;
+            }
+
+            .vocab-table tbody tr {
+                page-break-inside: avoid;
+            }
+
+            .instructions {
+                display: none !important;
+            }
+
+            .vocab-list-stats {
+                border: 1px solid #ddd;
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>中文詞彙分析工具</h1>
+            <p class="subtitle">Chinese Vocabulary Analyzer for Second Language Teaching</p>
+        </header>
+
+        <div class="workflow-steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-text">輸入文本<br>Input Text</div>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-text">TBCL 斷詞<br>Segmentation</div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-text">上傳結果<br>Upload CSV</div>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-text">對比資料庫<br>Compare DB</div>
+            </div>
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-text">選擇生詞<br>Select Words</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="card">
+                <h2 class="card-title">步驟 1: 輸入文本 | Input Text</h2>
+                <div class="instructions">
+                    在此輸入需要分析的中文文本，然後複製到 TBCL 網站進行斷詞分析。<br>
+                    Enter the Chinese text you want to analyze, then copy it to the TBCL website.
+                </div>
+                <textarea id="inputText" placeholder="請在此輸入中文文本...&#10;Enter Chinese text here..."></textarea>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="copyToClipboard()">📋 複製文本 Copy Text</button>
+                    <button class="btn-secondary" onclick="openTBCL()">🔗 打開 TBCL 網站 Open TBCL</button>
+                </div>
+                <div id="copyStatus"></div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">步驟 3: 上傳 CSV | Upload CSV</h2>
+                <div class="instructions">
+                    從 TBCL 網站下載斷詞結果 CSV 檔案，然後在此上傳。<br>
+                    Download the CSV file from TBCL and upload it here.<br>
+                    <strong>重要：</strong>確保 CSV 包含「詞彙」和「等級」欄位。<br>
+                    <strong>Important:</strong> Ensure CSV contains "詞彙" and "等級" columns.
+                </div>
+                <div class="file-upload">
+                    <input type="file" id="csvFile" accept=".csv" onchange="handleCSVUpload(event)">
+                    <label for="csvFile" class="file-upload-label">📁 選擇 CSV 檔案 Choose CSV File</label>
+                </div>
+                <div id="uploadStatus"></div>
+                <div id="csvPreview"></div>
+            </div>
+
+            <div class="card vocab-database">
+                <h2 class="card-title">詞彙資料庫 | Vocabulary Database</h2>
+                <div class="instructions">
+                    上傳或輸入已知詞彙，系統將篩選出未列入資料庫的生詞。<br>
+                    Upload or input known vocabulary to filter out new words.
+                </div>
+                <div class="word-controls">
+                    <input type="text" id="vocabInput" class="word-input" placeholder="輸入詞彙並按 Enter 添加 | Enter vocabulary and press Enter to add">
+                    <button class="btn-success" onclick="addVocab()">➕ 添加 Add</button>
+                </div>
+                <div class="file-upload">
+                    <input type="file" id="vocabFile" accept=".txt,.csv" onchange="handleVocabUpload(event)">
+                    <label for="vocabFile" class="file-upload-label">📁 上傳詞彙檔案 Upload Vocab File</label>
+                </div>
+                <div class="vocab-list" id="vocabList"></div>
+            </div>
+
+            <div class="card results-section">
+                <h2 class="card-title">步驟 4-5: 生詞篩選與選擇 | Filter & Select New Words</h2>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="compareVocabulary()">🔍 對比並篩選生詞 Compare & Filter</button>
+                    <button class="btn-secondary" onclick="showVocabList()">📋 顯示生詞表 Show Vocabulary List</button>
+                    <button class="btn-success" onclick="exportSelected()">💾 匯出選中的詞 Export Selected</button>
+                </div>
+                <div id="resultsStatus"></div>
+                <div class="word-list" id="newWordsList"></div>
+            </div>
+
+            <div class="card results-section" id="vocabListSection" style="display: none;">
+                <h2 class="card-title">選定的生詞表 | Selected Vocabulary List</h2>
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="printVocabList()">🖨️ 列印生詞表 Print List</button>
+                    <button class="btn-primary" onclick="copyVocabListText()">📋 複製生詞表 Copy List</button>
+                </div>
+                <div id="vocabListDisplay"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let vocabDatabase = new Set();
+        let csvData = [];
+        let selectedWords = new Set();
+        let filteredNewWords = []; // 儲存篩選後的生詞列表
+        let pinyinCache = {}; // 緩存拼音和釋義資料
+
+        // 使用 CC-CEDICT API 獲取拼音和釋義
+        async function getPinyinAndDefinition(word) {
+            // 檢查緩存
+            if (pinyinCache[word]) {
+                return pinyinCache[word];
+            }
+
+            try {
+                // 使用 chinese-dictionary API
+                const response = await fetch(`https://api.chinesedictionary.org/api/v1/simplified/${encodeURIComponent(word)}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const entry = data[0];
+                        // 移除聲調數字並連寫
+                        let pinyin = entry.pinyin || '';
+                        // 轉換為連寫格式（移除空格）
+                        pinyin = pinyin.replace(/\s+/g, '').toLowerCase();
+                        
+                        let definition = '';
+                        if (entry.definitions && entry.definitions.length > 0) {
+                            definition = entry.definitions[0];
+                        }
+                        
+                        const result = { 
+                            pinyin: pinyin || '', 
+                            definition: definition || ''
+                        };
+                        pinyinCache[word] = result;
+                        return result;
+                    }
+                }
+
+                // 如果第一個 API 失敗，嘗試使用備用 API
+                return await getAlternativePinyin(word);
+                
+            } catch (error) {
+                console.error('拼音查詢失敗:', error);
+                return await getAlternativePinyin(word);
+            }
+        }
+
+        // 備用 API：使用漢語拼音轉換
+        async function getAlternativePinyin(word) {
+            try {
+                // 使用 pinyin-pro 的線上服務（如果有）或本地轉換
+                const response = await fetch('https://www.mdbg.net/chinese/dictionary-search-json', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `searchText=${encodeURIComponent(word)}&page=0`
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.results && data.results.length > 0) {
+                        const entry = data.results[0];
+                        let pinyin = entry.pinyin || '';
+                        // 連寫拼音
+                        pinyin = pinyin.replace(/\s+/g, '').toLowerCase();
+                        
+                        let definition = entry.english || '';
+                        // 提取第一個定義
+                        if (definition.includes('/')) {
+                            definition = definition.split('/')[0].trim();
+                        }
+                        
+                        const result = { 
+                            pinyin: pinyin || '[查詢失敗]', 
+                            definition: definition || '[查詢失敗]'
+                        };
+                        pinyinCache[word] = result;
+                        return result;
+                    }
+                }
+
+                // 如果都失敗，返回空值讓用戶手動輸入
+                const result = { pinyin: '', definition: '' };
+                pinyinCache[word] = result;
+                return result;
+                
+            } catch (error) {
+                console.error('備用查詢也失敗:', error);
+                const result = { pinyin: '', definition: '' };
+                pinyinCache[word] = result;
+                return result;
+            }
+        }
+
+        // 批量獲取拼音和釋義（帶進度顯示）
+        async function enrichVocabData(vocabList) {
+            const enrichedList = [];
+            
+            for (let i = 0; i < vocabList.length; i++) {
+                const item = vocabList[i];
+                
+                // 如果已經有拼音和釋義就跳過
+                if (item.pinyin && item.definition) {
+                    enrichedList.push(item);
+                    continue;
+                }
+                
+                const { pinyin, definition } = await getPinyinAndDefinition(item.word);
+                
+                enrichedList.push({
+                    ...item,
+                    pinyin: pinyin || '',
+                    definition: definition || ''
+                });
+
+                // 更新進度
+                const progress = Math.round(((i + 1) / vocabList.length) * 100);
+                showStatus('resultsStatus', 
+                    `🔍 正在查詢拼音和釋義... ${i + 1}/${vocabList.length} (${progress}%)<br>Looking up pinyin and definitions... ${i + 1}/${vocabList.length} (${progress}%)`, 
+                    'info');
+                
+                // 避免請求過快
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+
+            return enrichedList;
+        }
+
+        // 添加詞彙到資料庫
+        function addVocab() {
+            const input = document.getElementById('vocabInput');
+            const word = input.value.trim();
+            if (word) {
+                vocabDatabase.add(word);
+                updateVocabList();
+                input.value = '';
+            }
+        }
+
+        // Enter 鍵添加詞彙
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('vocabInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addVocab();
+                }
+            });
+        });
+
+        // 更新詞彙列表顯示
+        function updateVocabList() {
+            const list = document.getElementById('vocabList');
+            list.innerHTML = Array.from(vocabDatabase)
+                .sort()
+                .map(word => `<div class="vocab-item">${word}</div>`)
+                .join('');
+        }
+
+        // 複製文本到剪貼板
+        function copyToClipboard() {
+            const text = document.getElementById('inputText').value;
+            if (!text) {
+                showStatus('copyStatus', '請先輸入文本 | Please enter text first', 'warning');
+                return;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showStatus('copyStatus', '✓ 文本已複製！現在請前往 TBCL 網站進行斷詞分析。<br>Text copied! Now go to TBCL website for segmentation.', 'success');
+            }).catch(err => {
+                showStatus('copyStatus', '複製失敗 | Copy failed: ' + err, 'warning');
+            });
+        }
+
+        // 打開 TBCL 網站
+        function openTBCL() {
+            window.open('https://coct.naer.edu.tw/edit.jsp', '_blank');
+            showStatus('copyStatus', 'ℹ TBCL 網站已在新視窗打開。完成斷詞後，請下載 CSV 並返回此頁面上傳。<br>TBCL website opened in new window. After segmentation, download CSV and return here to upload.', 'info');
+        }
+
+        // 處理 CSV 上傳
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseCSV(text);
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // 解析 CSV
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            csvData = [];
+            
+            // 解析標題行找出等級欄位的索引
+            let levelColumnIndex = -1;
+            if (lines.length > 0) {
+                const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
+                // 尋找包含「等級」、「level」、「grade」的欄位
+                levelColumnIndex = headers.findIndex(h => 
+                    h.includes('等級') || h.includes('level') || h.includes('grade') || h.includes('lv')
+                );
+                console.log('標題行:', headers);
+                console.log('等級欄位索引:', levelColumnIndex);
+            }
+            
+            for (let i = 1; i < lines.length; i++) { // 跳過標題行
+                // 使用正則表達式來正確分割 CSV（處理引號內的逗號）
+                const parts = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                const cleanParts = parts.map(p => p.trim().replace(/^"|"$/g, ''));
+                
+                if (cleanParts.length >= 1) {
+                    const word = cleanParts[0];
+                    // 如果找到等級欄位，使用該欄位；否則嘗試第二欄
+                    let level = '';
+                    if (levelColumnIndex > 0 && cleanParts[levelColumnIndex]) {
+                        level = cleanParts[levelColumnIndex].trim();
+                    } else if (cleanParts.length >= 2) {
+                        // 檢查第二欄是否看起來像等級（包含A/B/C或數字）
+                        const secondCol = cleanParts[1].trim();
+                        if (/^[ABC]\d*$|^Level|^Lv|等級/.test(secondCol)) {
+                            level = secondCol;
+                        }
+                    }
+                    
+                    if (word) {
+                        csvData.push({ word, level });
+                        if (i <= 3) {
+                            console.log(`Row ${i}: word="${word}", level="${level}", allParts:`, cleanParts);
+                        }
+                    }
+                }
+            }
+
+            showStatus('uploadStatus', `✓ CSV 上傳成功！共讀取 ${csvData.length} 個詞。<br>CSV uploaded successfully! ${csvData.length} words loaded.`, 'success');
+            
+            // 預覽前10個詞
+            const preview = csvData.slice(0, 10).map(item => 
+                `${item.word} (${item.level || 'TBCL未收'})`
+            ).join(', ');
+            document.getElementById('csvPreview').innerHTML = 
+                `<div class="status-message status-info"><strong>預覽 Preview:</strong> ${preview}...</div>`;
+        }
+
+        // 處理詞彙檔案上傳
+        function handleVocabUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const words = text.split(/[\n,\s]+/).filter(w => w.trim());
+                words.forEach(word => vocabDatabase.add(word.trim()));
+                updateVocabList();
+                showStatus('resultsStatus', `✓ 詞彙檔案上傳成功！已添加 ${words.length} 個詞。<br>Vocabulary file uploaded! ${words.length} words added.`, 'success');
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        // 對比詞彙並篩選生詞
+        function compareVocabulary() {
+            if (csvData.length === 0) {
+                showStatus('resultsStatus', '請先上傳 CSV 檔案！<br>Please upload CSV file first!', 'warning');
+                return;
+            }
+
+            filteredNewWords = csvData.filter(item => !vocabDatabase.has(item.word));
+            displayNewWords(filteredNewWords);
+
+            showStatus('resultsStatus', 
+                `✓ 對比完成！找到 ${filteredNewWords.length} 個新詞（共 ${csvData.length} 個詞）。<br>Comparison complete! Found ${filteredNewWords.length} new words (out of ${csvData.length} total).`, 
+                'success');
+        }
+
+        // 顯示生詞
+        function displayNewWords(words) {
+            const container = document.getElementById('newWordsList');
+            container.innerHTML = words.map((item, index) => {
+                const levelDisplay = item.level && item.level.trim() !== '' 
+                    ? item.level 
+                    : 'TBCL未收';
+                const levelClass = item.level && item.level.trim() !== '' 
+                    ? 'word-level' 
+                    : 'word-level-none';
+                
+                return `
+                    <div class="word-tag" id="word-${index}" onclick="toggleWord(${index})">
+                        <span>${item.word}</span>
+                        <span class="${levelClass}">${levelDisplay}</span>
+                        <div class="action-buttons">
+                            <button class="action-btn" onclick="event.stopPropagation(); splitWord(${index})">切詞</button>
+                            <button class="action-btn" onclick="event.stopPropagation(); mergeWord(${index})">合併</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 切換詞的選中狀態
+        function toggleWord(index) {
+            const element = document.getElementById(`word-${index}`);
+            const word = filteredNewWords[index].word;
+            
+            if (selectedWords.has(word)) {
+                selectedWords.delete(word);
+                element.classList.remove('selected');
+            } else {
+                selectedWords.add(word);
+                element.classList.add('selected');
+            }
+        }
+
+        // 切詞功能
+        function splitWord(index) {
+            const word = filteredNewWords[index].word;
+            const splitPoint = prompt(`請輸入切分位置（${word}，總長度 ${word.length}）：\nEnter split position (${word}, total length ${word.length}):`);
+            
+            if (splitPoint && !isNaN(splitPoint)) {
+                const pos = parseInt(splitPoint);
+                if (pos > 0 && pos < word.length) {
+                    const part1 = word.substring(0, pos);
+                    const part2 = word.substring(pos);
+                    
+                    // 更新 CSV 數據
+                    const originalIndex = csvData.findIndex(item => item.word === word);
+                    csvData[originalIndex] = { word: part1, level: csvData[originalIndex].level };
+                    csvData.splice(originalIndex + 1, 0, { word: part2, level: '' });
+                    
+                    compareVocabulary();
+                }
+            }
+        }
+
+        // 合併詞功能
+        function mergeWord(index) {
+            if (index >= filteredNewWords.length - 1) {
+                alert('無法合併：這是最後一個詞。\nCannot merge: This is the last word.');
+                return;
+            }
+            
+            const word1 = filteredNewWords[index].word;
+            const word2 = filteredNewWords[index + 1].word;
+            const merged = word1 + word2;
+            
+            if (confirm(`確定要合併「${word1}」和「${word2}」為「${merged}」嗎？\nMerge "${word1}" and "${word2}" into "${merged}"?`)) {
+                const idx1 = csvData.findIndex(item => item.word === word1);
+                const idx2 = csvData.findIndex(item => item.word === word2);
+                
+                csvData[idx1] = { word: merged, level: csvData[idx1].level };
+                csvData.splice(idx2, 1);
+                
+                compareVocabulary();
+            }
+        }
+
+        // 匯出選中的詞
+        function exportSelected() {
+            if (selectedWords.size === 0) {
+                showStatus('resultsStatus', '請先選擇要匯出的詞！<br>Please select words to export first!', 'warning');
+                return;
+            }
+
+            const exportData = filteredNewWords.filter(item => selectedWords.has(item.word));
+            
+            if (exportData.length === 0) {
+                showStatus('resultsStatus', '沒有可匯出的詞彙！<br>No vocabulary to export!', 'warning');
+                return;
+            }
+
+            const csvContent = '詞彙,拼音,釋義,等級\n' + exportData.map(item => {
+                const level = item.level || 'TBCL未收';
+                const pinyin = (item.pinyin && item.pinyin !== '點擊輸入拼音') ? item.pinyin : '';
+                const definition = (item.definition && item.definition !== '點擊輸入釋義') ? item.definition : '';
+                return `"${item.word}","${pinyin}","${definition}","${level}"`;
+            }).join('\n');
+
+            try {
+                const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.href = url;
+                link.download = '選定生詞_selected_vocabulary.csv';
+                link.style.display = 'none';
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                showStatus('resultsStatus', `✓ 已匯出 ${exportData.length} 個選中的詞！<br>✓ Exported ${exportData.length} selected words!`, 'success');
+            } catch (error) {
+                console.error('匯出錯誤:', error);
+                showStatus('resultsStatus', `匯出失敗：${error.message}<br>Export failed: ${error.message}`, 'warning');
+            }
+        }
+
+        // 顯示生詞表
+        async function showVocabList() {
+            if (selectedWords.size === 0) {
+                showStatus('resultsStatus', '請先選擇要顯示的詞！<br>Please select words to display first!', 'warning');
+                return;
+            }
+
+            let selectedData = filteredNewWords.filter(item => selectedWords.has(item.word));
+            
+            // 自動查詢拼音和釋義
+            showStatus('resultsStatus', '🔍 正在自動查詢拼音和釋義...<br>Automatically looking up pinyin and definitions...', 'info');
+            
+            selectedData = await enrichVocabData(selectedData);
+            
+            // 更新 filteredNewWords 中的資料
+            selectedData.forEach(updatedItem => {
+                const item = filteredNewWords.find(i => i.word === updatedItem.word);
+                if (item) {
+                    item.pinyin = updatedItem.pinyin;
+                    item.definition = updatedItem.definition;
+                }
+            });
+            
+            // 統計資訊
+            const totalWords = selectedData.length;
+            const wordsWithLevel = selectedData.filter(item => item.level && item.level.trim() !== '').length;
+            const wordsWithoutLevel = totalWords - wordsWithLevel;
+            const wordsWithPinyin = selectedData.filter(item => item.pinyin && item.pinyin.trim() !== '').length;
+
+            // 生成統計資訊
+            const statsHTML = `
+                <div class="vocab-list-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">${totalWords}</div>
+                        <div class="stat-label">總詞數<br>Total Words</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${wordsWithPinyin}</div>
+                        <div class="stat-label">已查詢拼音<br>Pinyin Found</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${wordsWithLevel}</div>
+                        <div class="stat-label">TBCL收錄<br>In TBCL</div>
+                    </div>
+                </div>
+                <div class="instructions">
+                    💡 提示：拼音和釋義已自動查詢。如需修改，點擊欄位即可直接編輯。<br>
+                    Tip: Pinyin and definitions are auto-generated. Click fields to edit if needed.
+                </div>
+            `;
+
+            // 生成表格
+            const tableHTML = `
+                <table class="vocab-table">
+                    <thead>
+                        <tr>
+                            <th class="col-number">#</th>
+                            <th class="col-word">詞彙<br>Word</th>
+                            <th class="col-pinyin">拼音<br>Pinyin</th>
+                            <th class="col-definition">釋義<br>Definition</th>
+                            <th class="col-level">等級<br>Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${selectedData.map((item, index) => {
+                            const levelDisplay = item.level && item.level.trim() !== '' ? item.level : 'TBCL未收';
+                            const levelClass = item.level && item.level.trim() !== '' ? 'has-level' : 'no-level';
+                            const pinyinDisplay = item.pinyin || '點擊輸入拼音';
+                            const definitionDisplay = item.definition || '點擊輸入釋義';
+                            const pinyinStyle = item.pinyin ? '' : 'color: #ccc;';
+                            const definitionStyle = item.definition ? '' : 'color: #ccc;';
+                            
+                            return `
+                                <tr>
+                                    <td class="col-number">${index + 1}</td>
+                                    <td class="col-word">${item.word}</td>
+                                    <td class="col-pinyin" contenteditable="true" 
+                                        data-word="${item.word}" 
+                                        data-field="pinyin"
+                                        onblur="updateVocabField(this)"
+                                        onclick="this.focus(); if(this.textContent==='點擊輸入拼音') this.textContent='';"
+                                        style="cursor: text; min-height: 20px; padding: 1rem; border: 1px solid transparent; ${pinyinStyle}"
+                                        onfocus="this.style.border='1px solid var(--primary)'; this.style.background='#fff5f0'"
+                                        onblur="this.style.border='1px solid transparent'; this.style.background='transparent'">${pinyinDisplay}</td>
+                                    <td class="col-definition" contenteditable="true"
+                                        data-word="${item.word}"
+                                        data-field="definition"
+                                        onblur="updateVocabField(this)"
+                                        onclick="this.focus(); if(this.textContent==='點擊輸入釋義') this.textContent='';"
+                                        style="cursor: text; min-height: 20px; padding: 1rem; border: 1px solid transparent; ${definitionStyle}"
+                                        onfocus="this.style.border='1px solid var(--primary)'; this.style.background='#fff5f0'"
+                                        onblur="this.style.border='1px solid transparent'; this.style.background='transparent'">${definitionDisplay}</td>
+                                    <td class="col-level">
+                                        <span class="level-badge ${levelClass}">${levelDisplay}</span>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            // 顯示生詞表區域
+            const section = document.getElementById('vocabListSection');
+            const display = document.getElementById('vocabListDisplay');
+            display.innerHTML = statsHTML + tableHTML;
+            section.style.display = 'block';
+
+            // 滾動到生詞表
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            showStatus('resultsStatus', `✓ 生詞表已顯示！共 ${totalWords} 個詞，成功查詢 ${wordsWithPinyin} 個拼音。<br>Vocabulary list displayed! ${totalWords} words total, ${wordsWithPinyin} pinyin found.`, 'success');
+        }
+
+        // 更新詞彙欄位（拼音或釋義）
+        function updateVocabField(element) {
+            const word = element.getAttribute('data-word');
+            const field = element.getAttribute('data-field');
+            let value = element.textContent.trim();
+
+            // 如果是佔位文字，視為空值
+            if (value === '點擊輸入拼音' || value === '點擊輸入釋義') {
+                value = '';
+            }
+
+            // 更新 filteredNewWords 中的資料
+            const item = filteredNewWords.find(item => item.word === word);
+            if (item) {
+                item[field] = value;
+            }
+
+            // 如果內容為空，顯示提示文字
+            if (!value) {
+                element.textContent = field === 'pinyin' ? '點擊輸入拼音' : '點擊輸入釋義';
+                element.style.color = '#ccc';
+            } else {
+                element.style.color = '';
+            }
+        }
+
+        // 列印生詞表
+        function printVocabList() {
+            window.print();
+        }
+
+        // 複製生詞表文本
+        function copyVocabListText() {
+            if (selectedWords.size === 0) {
+                alert('請先顯示生詞表！\nPlease display vocabulary list first!');
+                return;
+            }
+
+            const selectedData = filteredNewWords.filter(item => selectedWords.has(item.word));
+            
+            if (selectedData.length === 0) {
+                alert('沒有可複製的詞彙！\nNo vocabulary to copy!');
+                return;
+            }
+
+            const textContent = '生詞表 Vocabulary List\n' + 
+                               '='.repeat(80) + '\n\n' +
+                               selectedData.map((item, index) => {
+                                   const level = item.level && item.level.trim() !== '' ? item.level : 'TBCL未收';
+                                   const pinyin = (item.pinyin && item.pinyin !== '點擊輸入拼音') ? item.pinyin : '';
+                                   const definition = (item.definition && item.definition !== '點擊輸入釋義') ? item.definition : '';
+                                   
+                                   let line = `${index + 1}. ${item.word}`;
+                                   if (pinyin) line += ` (${pinyin})`;
+                                   if (definition) line += ` - ${definition}`;
+                                   line += ` [${level}]`;
+                                   
+                                   return line;
+                               }).join('\n') + '\n\n' + 
+                               `總計：${selectedData.length} 個詞\nTotal: ${selectedData.length} words`;
+
+            navigator.clipboard.writeText(textContent).then(() => {
+                alert('✓ 生詞表已複製到剪貼板！\n✓ Vocabulary list copied to clipboard!');
+            }).catch(err => {
+                // 如果 clipboard API 失敗，使用備用方法
+                const textarea = document.createElement('textarea');
+                textarea.value = textContent;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('✓ 生詞表已複製到剪貼板！\n✓ Vocabulary list copied to clipboard!');
+                } catch (e) {
+                    alert('複製失敗，請手動複製。\nCopy failed: ' + err);
+                } finally {
+                    document.body.removeChild(textarea);
+                }
+            });
+        }
+
+        // 顯示狀態訊息
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="status-message status-${type}">${message}</div>`;
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
