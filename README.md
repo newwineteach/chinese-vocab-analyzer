@@ -110,128 +110,6 @@ open chinese-vocab-analyzer.html
 - 📋 **複製**：複製格式化的純文字到剪貼板
 - 💾 **匯出 CSV**：下載包含所有資訊的 CSV 檔案
 
-## 📊 輸出格式 | Output Formats
-
-### CSV 格式 | CSV Format
-```csv
-詞彙,拼音,釋義,等級
-自動,zidong,自動的；不用人操作的,B1
-智慧型,zhihuixing,具有智能的,B2
-```
-
-### 純文字格式 | Plain Text Format
-```
-生詞表 Vocabulary List
-================================================================================
-
-1. 自動 (zidong) - 自動的；不用人操作的 [B1]
-2. 智慧型 (zhihuixing) - 具有智能的 [B2]
-3. 打開 (dakai) - 使關閉的東西分開 [A2]
-
-總計：3 個詞
-Total: 3 words
-```
-
-## 🛠️ 技術規格 | Technical Specifications
-
-### 前端技術 | Frontend Technologies
-- **HTML5** - 結構與語義
-- **CSS3** - 樣式與動畫
-- **Vanilla JavaScript** - 核心邏輯（無框架依賴）
-
-### 外部 API | External APIs
-- **Chinese Dictionary API** - 拼音和釋義查詢（主要）
-- **MDBG Chinese Dictionary API** - 備用查詢
-- **TBCL 系統** - 詞彙等級標準
-
-### 瀏覽器相容性 | Browser Compatibility
-- ✅ Chrome 90+
-- ✅ Firefox 88+
-- ✅ Edge 90+
-- ✅ Safari 14+
-
-### 檔案大小 | File Size
-- 單一 HTML 檔案：約 70KB
-- 無需安裝依賴
-
-## 🎨 設計特色 | Design Features
-
-### 視覺設計 | Visual Design
-- 🎨 傳統中國書法風格
-- 🔴 配色：中國紅、沙金色、墨綠色
-- 📐 清晰的層次結構
-- ✨ 流暢的動畫效果
-
-### 使用者體驗 | User Experience
-- 💡 清楚的操作提示
-- 📊 即時進度顯示
-- ⚡ 快速回應
-- 🎯 直覺的互動設計
-
-## 📝 使用案例 | Use Cases
-
-### 教師用途 | For Teachers
-- 📚 準備教材時快速生成生詞表
-- 📊 分析文本難度與詞彙等級
-- 📋 製作課堂講義
-- 🎓 評估學生閱讀材料適切性
-
-### 學生用途 | For Students
-- 📖 自主學習生詞整理
-- ✍️ 閱讀前預習詞彙
-- 📝 製作個人生詞本
-- 🔍 查詢詞彙拼音和釋義
-
-### 教材編寫 | For Material Development
-- 📚 教材詞彙分級
-- 📊 詞頻統計分析
-- 📋 生詞索引製作
-- 🎯 難度控制
-
-## ⚙️ 設定與自訂 | Configuration & Customization
-
-### 修改樣式 | Modify Styles
-在 `<style>` 標籤中修改 CSS 變數：
-```css
-:root {
-    --primary: #c41e3a;      /* 主要顏色 */
-    --secondary: #f4a460;    /* 次要顏色 */
-    --accent: #2d5f3f;       /* 強調顏色 */
-    /* ... 更多變數 */
-}
-```
-
-### 調整功能 | Adjust Features
-在 `<script>` 標籤中修改 JavaScript 設定：
-```javascript
-// 修改 API 請求延遲（毫秒）
-await new Promise(resolve => setTimeout(resolve, 200));
-
-// 修改狀態訊息顯示時間（毫秒）
-setTimeout(() => {
-    element.innerHTML = '';
-}, 5000);
-```
-
-## 🤝 貢獻指南 | Contributing
-
-歡迎提交問題和拉取請求！
-
-Welcome to submit issues and pull requests!
-
-### 開發流程 | Development Process
-1. Fork 本專案
-2. 建立功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟 Pull Request
-
-### 程式碼規範 | Code Standards
-- 使用有意義的變數名稱
-- 添加適當的註解（中英文）
-- 保持程式碼簡潔易讀
-- 測試所有新功能
-
 ## 📄 授權 | License
 
 MIT License
@@ -256,13 +134,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-## 📧 聯絡方式 | Contact
 
-如有問題或建議，歡迎透過以下方式聯絡：
-For questions or suggestions, please contact via:
 
-- GitHub Issues: [提交問題](https://github.com/your-username/chinese-vocab-analyzer/issues)
-- Email: your-email@example.com
 
 ## 🙏 致謝 | Acknowledgments
 
@@ -279,8 +152,4 @@ For questions or suggestions, please contact via:
 - 📊 生詞表生成與匯出
 - 🎨 美觀的中國風介面設計
 
----
 
-**Made with ❤️ for Chinese Language Teachers and Learners**
-
-**為華語文教師與學習者精心打造**
